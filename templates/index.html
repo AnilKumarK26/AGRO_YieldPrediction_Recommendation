@@ -1,0 +1,756 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropPredict AI - Crop Yield Prediction Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .trend-up {
+            color: #10b981;
+        }
+        .trend-down {
+            color: #ef4444;
+        }
+        .trend-stable {
+            color: #6b7280;
+        }
+        .market-score {
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+            height: 8px;
+            border-radius: 4px;
+            position: relative;
+        }
+        .score-indicator {
+            position: absolute;
+            width: 4px;
+            height: 16px;
+            background: #1f2937;
+            border-radius: 2px;
+            top: -4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-seedling text-2xl"></i>
+                    <h1 class="text-2xl font-bold">CropPredict AI</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="langToggle" class="bg-white bg-opacity-20 px-3 py-1 rounded-lg hover:bg-opacity-30 transition">
+                        <i class="fas fa-language mr-1"></i> हिंदी/English
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4" data-en="AI-Powered Crop Yield Prediction" data-hi="एआई-संचालित फसल उत्पादन पूर्वानुमान">AI-Powered Crop Yield Prediction</h2>
+            <p class="text-xl text-gray-600" data-en="Get accurate yield predictions, farming recommendations, and market analysis based on real data" data-hi="वास्तविक डेटा के आधार पर सटीक उत्पादन पूर्वानुमान, कृषि सिफारिशें और बाजार विश्लेषण प्राप्त करें">Get accurate yield predictions, farming recommendations, and market analysis based on real data</p>
+        </div>
+
+        <!-- Input Form -->
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-seedling text-green-600 mr-3"></i>
+                <span data-en="Crop Prediction Form" data-hi="फसल पूर्वानुमान फॉर्म">Crop Prediction Form</span>
+            </h3>
+            
+            <form id="predictionForm" class="grid md:grid-cols-2 gap-6">
+                <!-- Basic Information -->
+                <div class="space-y-4">
+                    <h4 class="text-lg font-medium text-gray-700" data-en="Basic Information" data-hi="बुनियादी जानकारी">Basic Information</h4>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="State" data-hi="राज्य">State</label>
+                        <select id="state" name="state" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select State</option>
+                            <option value="odisha">Odisha (ओडिशा)</option>
+                            <option value="andhra pradesh">Andhra Pradesh (आंध्र प्रदेश)</option>
+                            <option value="telangana">Telangana (तेलंगाना)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="District" data-hi="जिला">District</label>
+                        <input type="text" id="district" name="district" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter district name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Crop Type" data-hi="फसल का प्रकार">Crop Type</label>
+                        <select id="cropType" name="crop_type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select Crop</option>
+                            <option value="rice">Rice (चावल)</option>
+                            <option value="wheat">Wheat (गेहूं)</option>
+                            <option value="cotton">Cotton (कपास)</option>
+                            <option value="maize">Maize (मक्का)</option>
+                            <option value="sugarcane">Sugarcane (गन्ना)</option>
+                            <option value="groundnut">Groundnut (मूंगफली)</option>
+                            <option value="soybean">Soybean (सोयाबीन)</option>
+                            <option value="turmeric">Turmeric (हल्दी)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Land Area (Hectares)" data-hi="भूमि क्षेत्र (हेक्टेयर)">Land Area (Hectares)</label>
+                        <input type="number" id="areaHectares" name="area_hectares" step="0.1" min="0.1" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 2.5">
+                    </div>
+                </div>
+
+                <!-- Farm Management -->
+                <div class="space-y-4">
+                    <h4 class="text-lg font-medium text-gray-700" data-en="Farm Management" data-hi="खेत प्रबंधन">Farm Management</h4>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Fertilizer (kg/hectare)" data-hi="उर्वरक (किग्रा/हेक्टेयर)">Fertilizer (kg/hectare)</label>
+                        <input type="number" id="fertilizer" name="fertilizer" min="0" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 50">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Pesticide (kg/hectare)" data-hi="कीटनाशक (किग्रा/हेक्टेयर)">Pesticide (kg/hectare)</label>
+                        <input type="number" id="pesticide" name="pesticide" min="0" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 5">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Latitude" data-hi="अक्षांश">Latitude</label>
+                        <input type="number" id="latitude" name="latitude" step="0.000001" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 20.2961">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Longitude" data-hi="देशांतर">Longitude</label>
+                        <input type="number" id="longitude" name="longitude" step="0.000001" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 85.8245">
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button type="button" id="getCurrentLocation" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+                            <i class="fas fa-location-arrow mr-2"></i>
+                            <span data-en="Get Current Location" data-hi="वर्तमान स्थान प्राप्त करें">Get Current Location</span>
+                        </button>
+                    </div>
+                    
+                    <div id="locationStatus" class="text-sm text-gray-600"></div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="md:col-span-2 text-center">
+                    <button type="submit" id="predictBtn" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-blue-700 transition text-lg font-semibold">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        <span data-en="Predict Crop Yield" data-hi="फसल उत्पादन का पूर्वानुमान लगाएं">Predict Crop Yield</span>
+                    </button>
+                    <div id="loadingIndicator" class="hidden mt-4 flex justify-center">
+                        <div class="loading-spinner"></div>
+                        <span class="ml-3" data-en="Analyzing data and generating prediction..." data-hi="डेटा का विश्लेषण और पूर्वानुमान तैयार कर रहे हैं...">Analyzing data and generating prediction...</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden max-w-6xl mx-auto">
+            <!-- Prediction Results -->
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-chart-bar text-blue-600 mr-3"></i>
+                    <span data-en="Yield Prediction Results" data-hi="उत्पादन पूर्वानुमान परिणाम">Yield Prediction Results</span>
+                </h3>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-gradient-to-r from-green-400 to-green-600 text-white p-6 rounded-lg text-center">
+                        <i class="fas fa-leaf text-3xl mb-2"></i>
+                        <h4 class="text-lg font-semibold" data-en="Yield per Hectare" data-hi="प्रति हेक्टेयर उत्पादन">Yield per Hectare</h4>
+                        <p id="yieldPerHectare" class="text-2xl font-bold">-- quintals</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-blue-400 to-blue-600 text-white p-6 rounded-lg text-center">
+                        <i class="fas fa-weight-hanging text-3xl mb-2"></i>
+                        <h4 class="text-lg font-semibold" data-en="Total Production" data-hi="कुल उत्पादन">Total Production</h4>
+                        <p id="totalProduction" class="text-2xl font-bold">-- quintals</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-400 to-purple-600 text-white p-6 rounded-lg text-center">
+                        <i class="fas fa-rupee-sign text-3xl mb-2"></i>
+                        <h4 class="text-lg font-semibold" data-en="Estimated Value" data-hi="अनुमानित मूल्य">Estimated Value</h4>
+                        <p id="estimatedValue" class="text-2xl font-bold">₹ --</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Recommendations -->
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-lightbulb text-yellow-600 mr-3"></i>
+                    <span data-en="AI-Powered Recommendations" data-hi="एआई-संचालित सिफारिशें">AI-Powered Recommendations</span>
+                </h3>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h5 class="font-semibold text-blue-800 mb-3 flex items-center">
+                            <i class="fas fa-tint mr-2"></i>
+                            <span data-en="Irrigation" data-hi="सिंचाई">Irrigation</span>
+                        </h5>
+                        <div id="irrigationRecs" class="space-y-2">
+                            <!-- Irrigation recommendations -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h5 class="font-semibold text-green-800 mb-3 flex items-center">
+                            <i class="fas fa-leaf mr-2"></i>
+                            <span data-en="Fertilization" data-hi="उर्वरक">Fertilization</span>
+                        </h5>
+                        <div id="fertilizationRecs" class="space-y-2">
+                            <!-- Fertilization recommendations -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <h5 class="font-semibold text-red-800 mb-3 flex items-center">
+                            <i class="fas fa-bug mr-2"></i>
+                            <span data-en="Pest Control" data-hi="कीट नियंत्रण">Pest Control</span>
+                        </h5>
+                        <div id="pestControlRecs" class="space-y-2">
+                            <!-- Pest control recommendations -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h5 class="font-semibold text-purple-800 mb-3 flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span data-en="General" data-hi="सामान्य">General</span>
+                        </h5>
+                        <div id="generalRecs" class="space-y-2">
+                            <!-- General recommendations -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Analysis Section -->
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-chart-line text-green-600 mr-3"></i>
+                    <span data-en="Market Trend Analysis" data-hi="बाजार प्रवृत्ति विश्लेषण">Market Trend Analysis</span>
+                </h3>
+                
+                <!-- Current Market Status -->
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white p-6 rounded-lg text-center">
+                        <i class="fas fa-rupee-sign text-3xl mb-2"></i>
+                        <h4 class="text-lg font-semibold" data-en="Current Price" data-hi="वर्तमान मूल्य">Current Price</h4>
+                        <p id="currentPrice" class="text-2xl font-bold">₹ -- / quintal</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-amber-400 to-amber-600 text-white p-6 rounded-lg text-center">
+                        <i class="fas fa-balance-scale text-3xl mb-2"></i>
+                        <h4 class="text-lg font-semibold" data-en="Demand Level" data-hi="मांग स्तर">Demand Level</h4>
+                        <p id="demandLevel" class="text-2xl font-bold">--</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-indigo-400 to-indigo-600 text-white p-6 rounded-lg text-center">
+                        <i class="fas fa-trending-up text-3xl mb-2"></i>
+                        <h4 class="text-lg font-semibold" data-en="Market Sentiment" data-hi="बाजार भावना">Market Sentiment</h4>
+                        <p id="marketSentiment" class="text-2xl font-bold">--</p>
+                    </div>
+                </div>
+
+                <!-- Monthly Trends -->
+                <div class="mb-8">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>
+                        <span data-en="Monthly Price Trends" data-hi="मासिक मूल्य रुझान">Monthly Price Trends</span>
+                    </h4>
+                    <div id="monthlyTrends" class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- Monthly trends will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Future Outlook -->
+                <div class="mb-8">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-crystal-ball text-purple-600 mr-2"></i>
+                        <span data-en="Future Market Outlook" data-hi="भविष्य के बाजार का दृष्टिकोण">Future Market Outlook</span>
+                    </h4>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-gray-800 mb-2" data-en="Next 3 Months" data-hi="अगले 3 महीने">Next 3 Months</h5>
+                            <p id="outlook3Months" class="text-sm text-gray-600">--</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-gray-800 mb-2" data-en="Next 6 Months" data-hi="अगले 6 महीने">Next 6 Months</h5>
+                            <p id="outlook6Months" class="text-sm text-gray-600">--</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-gray-800 mb-2" data-en="Next 12 Months" data-hi="अगले 12 महीने">Next 12 Months</h5>
+                            <p id="outlook12Months" class="text-sm text-gray-600">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Recommendations -->
+                <div class="mb-8">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-handshake text-green-600 mr-2"></i>
+                        <span data-en="Market Strategy Recommendations" data-hi="बाजार रणनीति सिफारिशें">Market Strategy Recommendations</span>
+                    </h4>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-green-800 mb-2" data-en="Optimal Selling Time" data-hi="सर्वोत्तम बिक्री समय">Optimal Selling Time</h5>
+                            <p id="optimalSellingTime" class="text-sm text-gray-700">--</p>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-blue-800 mb-2" data-en="Market Strategies" data-hi="बाजार रणनीतियां">Market Strategies</h5>
+                            <ul id="marketStrategies" class="text-sm text-gray-700 list-disc list-inside space-y-1">
+                                <!-- Market strategies will be populated here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trending Crops -->
+                <div class="mb-6">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-fire text-red-600 mr-2"></i>
+                        <span data-en="Regional Crop Trends" data-hi="क्षेत्रीय फसल रुझान">Regional Crop Trends</span>
+                    </h4>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-green-800 mb-3 flex items-center">
+                                <i class="fas fa-arrow-up mr-2"></i>
+                                <span data-en="Currently Trending" data-hi="वर्तमान में लोकप्रिय">Currently Trending</span>
+                            </h5>
+                            <div id="currentTrendingCrops" class="space-y-2">
+                                <!-- Current trending crops -->
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-blue-800 mb-3 flex items-center">
+                                <i class="fas fa-arrow-trend-up mr-2"></i>
+                                <span data-en="Future Potential" data-hi="भविष्य की संभावना">Future Potential</span>
+                            </h5>
+                            <div id="futureTrendingCrops" class="space-y-2">
+                                <!-- Future trending crops -->
+                            </div>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-red-800 mb-3 flex items-center">
+                                <i class="fas fa-arrow-down mr-2"></i>
+                                <span data-en="Declining Demand" data-hi="घटती मांग">Declining Demand</span>
+                            </h5>
+                            <div id="decliningCrops" class="space-y-2">
+                                <!-- Declining crops -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crop Comparison Section -->
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-balance-scale text-orange-600 mr-3"></i>
+                    <span data-en="Alternative Crop Comparison" data-hi="वैकल्पिक फसल तुलना">Alternative Crop Comparison</span>
+                </h3>
+                
+                <!-- Primary Crop -->
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-3" data-en="Your Selected Crop" data-hi="आपकी चुनी गई फसल">Your Selected Crop</h4>
+                    <div id="primaryCropCard" class="bg-gradient-to-r from-green-100 to-green-200 p-4 rounded-lg">
+                        <!-- Primary crop details -->
+                    </div>
+                </div>
+
+                <!-- Alternative Crops -->
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-800 mb-3" data-en="Alternative Crops to Consider" data-hi="विचार करने योग्य वैकल्पिक फसलें">Alternative Crops to Consider</h4>
+                    <div id="alternativeCrops" class="grid md:grid-cols-3 gap-4">
+                        <!-- Alternative crop cards -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-6 text-center">
+            <p data-en="CropPredict AI - Empowering farmers with data-driven insights and market intelligence" data-hi="क्रॉपप्रेडिक्ट एआई - डेटा-संचालित अंतर्दृष्टि और बाजार बुद्धिमत्ता के साथ किसानों को सशक्त बनाना">CropPredict AI - Empowering farmers with data-driven insights and market intelligence</p>
+            <p class="text-gray-400 mt-2" data-en="Built with real agricultural data from Odisha and Andhra Pradesh" data-hi="ओडिशा और आंध्र प्रदेश के वास्तविक कृषि डेटा के साथ निर्मित">Built with real agricultural data from Odisha and Andhra Pradesh</p>
+        </div>
+    </footer>
+
+    <script>
+        // Language toggle functionality
+        let currentLanguage = 'en';
+        const langToggle = document.getElementById('langToggle');
+        
+        langToggle.addEventListener('click', () => {
+            currentLanguage = currentLanguage === 'en' ? 'hi' : 'en';
+            updateLanguage();
+        });
+        
+        function updateLanguage() {
+            const elements = document.querySelectorAll('[data-en][data-hi]');
+            elements.forEach(element => {
+                const text = element.getAttribute(`data-${currentLanguage}`);
+                if (text) {
+                    element.textContent = text;
+                }
+            });
+        }
+
+        // Get current location
+        document.getElementById('getCurrentLocation').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
+                        document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
+                        document.getElementById('locationStatus').innerHTML = 
+                            '<i class="fas fa-check-circle text-green-500"></i> Location obtained successfully';
+                    },
+                    (error) => {
+                        document.getElementById('locationStatus').innerHTML = 
+                            '<i class="fas fa-exclamation-circle text-red-500"></i> Unable to get location';
+                    }
+                );
+            }
+        });
+
+        // Form submission
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Show loading indicator
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            document.getElementById('predictBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayResults(result);
+                    document.getElementById('resultsSection').classList.remove('hidden');
+                    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Error: ' + (result.error || 'Unable to generate prediction'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+            } finally {
+                document.getElementById('loadingIndicator').classList.add('hidden');
+                document.getElementById('predictBtn').disabled = false;
+            }
+        });
+
+        function displayResults(result) {
+            // Display yield results
+            document.getElementById('yieldPerHectare').textContent = 
+                `${result.predicted_yield_per_hectare} quintals`;
+            document.getElementById('totalProduction').textContent = 
+                `${result.total_expected_production} quintals`;
+            
+            // Estimate value using market analysis current price or fallback
+            let pricePerQuintal = 2000; // Default fallback
+            if (result.market_analysis && result.market_analysis.current_status && result.market_analysis.current_status.price_range) {
+                pricePerQuintal = result.market_analysis.current_status.price_range.current || 2000;
+            }
+            
+            const estimatedValue = result.total_expected_production * pricePerQuintal;
+            document.getElementById('estimatedValue').textContent = 
+                `₹ ${estimatedValue.toLocaleString('en-IN')}`;
+            
+            // Display recommendations
+            displayRecommendations(result.recommendations);
+            
+            // Display market analysis
+            displayMarketAnalysis(result.market_analysis);
+            
+            // Display crop comparison
+            displayCropComparison(result.crop_comparison);
+        }
+
+        function displayRecommendations(recommendations) {
+            const categories = ['irrigation', 'fertilization', 'pestControl', 'general'];
+            const categoryNames = ['irrigationRecs', 'fertilizationRecs', 'pestControlRecs', 'generalRecs'];
+            
+            categories.forEach((category, index) => {
+                const container = document.getElementById(categoryNames[index]);
+                const recs = recommendations[category] || [];
+                
+                if (recs.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-sm">No specific recommendations</p>';
+                    return;
+                }
+                
+                container.innerHTML = recs.map(rec => `
+                    <div class="mb-2">
+                        <div class="font-medium text-sm ${getPriorityClass(rec.priority)}">${rec.action}</div>
+                        <div class="text-xs text-gray-600">${rec.details}</div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function displayMarketAnalysis(marketAnalysis) {
+            if (!marketAnalysis) {
+                console.warn('No market analysis data available');
+                return;
+            }
+
+            // Current market status
+            if (marketAnalysis.current_status) {
+                const priceRange = marketAnalysis.current_status.price_range || {};
+                document.getElementById('currentPrice').textContent = 
+                    `₹ ${priceRange.current || '--'} / quintal`;
+                
+                document.getElementById('demandLevel').textContent = 
+                    (marketAnalysis.current_status.demand_level || '--').toUpperCase();
+                
+                document.getElementById('marketSentiment').textContent = 
+                    (marketAnalysis.current_status.market_sentiment || '--').toUpperCase();
+            }
+
+            // Monthly trends
+            if (marketAnalysis.monthly_trends && marketAnalysis.monthly_trends.length > 0) {
+                displayMonthlyTrends(marketAnalysis.monthly_trends);
+            }
+
+            // Future outlook
+            if (marketAnalysis.future_outlook) {
+                document.getElementById('outlook3Months').textContent = 
+                    marketAnalysis.future_outlook.next_3_months || marketAnalysis.future_outlook.summary || '--';
+                document.getElementById('outlook6Months').textContent = 
+                    marketAnalysis.future_outlook.next_6_months || '--';
+                document.getElementById('outlook12Months').textContent = 
+                    marketAnalysis.future_outlook.next_12_months || '--';
+            }
+
+            // Market recommendations
+            if (marketAnalysis.recommendations) {
+                document.getElementById('optimalSellingTime').textContent = 
+                    marketAnalysis.recommendations.optimal_selling_time || '--';
+                
+                const strategiesContainer = document.getElementById('marketStrategies');
+                const strategies = marketAnalysis.recommendations.market_strategies || [];
+                strategiesContainer.innerHTML = strategies.length > 0 
+                    ? strategies.map(strategy => `<li>${strategy}</li>`).join('') 
+                    : '<li>No specific strategies available</li>';
+            }
+
+            // Trending crops
+            if (marketAnalysis.trending_crops) {
+                displayTrendingCrops(marketAnalysis.trending_crops);
+            }
+        }
+
+        function displayMonthlyTrends(monthlyTrends) {
+            const container = document.getElementById('monthlyTrends');
+            const trendsHtml = monthlyTrends.slice(0, 12).map(trend => {
+                const trendIcon = getTrendIcon(trend.trend);
+                const trendColor = getTrendColor(trend.trend);
+                
+                return `
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium text-gray-800">${trend.month}</span>
+                            <span class="${trendColor}">${trendIcon}</span>
+                        </div>
+                        <p class="text-xs text-gray-600">${trend.description || trend.trend}</p>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = trendsHtml;
+        }
+
+        function displayTrendingCrops(trendingCrops) {
+            // Current trending crops
+            const currentContainer = document.getElementById('currentTrendingCrops');
+            const currentCrops = trendingCrops.current_trending || [];
+            currentContainer.innerHTML = currentCrops.length > 0
+                ? currentCrops.map(crop => `
+                    <div class="text-sm">
+                        <div class="font-medium text-green-800 capitalize">${crop.crop}</div>
+                        <div class="text-xs text-gray-600">${crop.reason}</div>
+                    </div>
+                `).join('')
+                : '<p class="text-sm text-gray-500">No data available</p>';
+
+            // Future trending crops
+            const futureContainer = document.getElementById('futureTrendingCrops');
+            const futureCrops = trendingCrops.future_trending || [];
+            futureContainer.innerHTML = futureCrops.length > 0
+                ? futureCrops.map(crop => `
+                    <div class="text-sm">
+                        <div class="font-medium text-blue-800 capitalize">${crop.crop}</div>
+                        <div class="text-xs text-gray-600">${crop.reason}</div>
+                    </div>
+                `).join('')
+                : '<p class="text-sm text-gray-500">No data available</p>';
+
+            // Declining crops
+            const decliningContainer = document.getElementById('decliningCrops');
+            const decliningCrops = trendingCrops.declining_crops || [];
+            decliningContainer.innerHTML = decliningCrops.length > 0
+                ? decliningCrops.map(crop => `
+                    <div class="text-sm">
+                        <div class="font-medium text-red-800 capitalize">${crop.crop}</div>
+                        <div class="text-xs text-gray-600">${crop.reason}</div>
+                    </div>
+                `).join('')
+                : '<p class="text-sm text-gray-500">No data available</p>';
+        }
+
+        function displayCropComparison(cropComparison) {
+            if (!cropComparison) {
+                console.warn('No crop comparison data available');
+                return;
+            }
+
+            // Primary crop
+            const primaryCrop = cropComparison.primary_crop;
+            if (primaryCrop) {
+                const primaryContainer = document.getElementById('primaryCropCard');
+                const priceInfo = primaryCrop.price_info || {};
+                const marketScore = primaryCrop.market_score || 5;
+                
+                primaryContainer.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h5 class="text-lg font-bold text-green-800 capitalize mb-2">${primaryCrop.name}</h5>
+                            <div class="text-sm text-gray-700">
+                                <p><strong>Current Price:</strong> ₹${priceInfo.current || '--'} per quintal</p>
+                                <p><strong>Price Range:</strong> ₹${priceInfo.min || '--'} - ₹${priceInfo.max || '--'}</p>
+                                <p><strong>Market Score:</strong> ${marketScore}/10</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="market-score w-24 mb-2">
+                                <div class="score-indicator" style="left: ${(marketScore/10) * 100 - 2}%"></div>
+                            </div>
+                            <div class="text-lg font-bold text-green-600">
+                                <i class="fas fa-star"></i> Selected
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Alternative crops
+            const alternatives = cropComparison.alternatives || [];
+            const alternativesContainer = document.getElementById('alternativeCrops');
+            
+            if (alternatives.length > 0) {
+                alternativesContainer.innerHTML = alternatives.map(crop => {
+                    const priceInfo = crop.price_info || {};
+                    const marketScore = crop.market_score || 5;
+                    const recommendation = crop.recommendation || 'Consider based on local conditions';
+                    
+                    return `
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition">
+                            <h6 class="font-bold text-gray-800 capitalize mb-2">${crop.name}</h6>
+                            <div class="text-sm text-gray-600 mb-3">
+                                <p><strong>Price:</strong> ₹${priceInfo.current || '--'}/quintal</p>
+                                <p><strong>Range:</strong> ₹${priceInfo.min || '--'} - ₹${priceInfo.max || '--'}</p>
+                            </div>
+                            <div class="market-score w-full mb-2">
+                                <div class="score-indicator" style="left: ${(marketScore/10) * 100 - 2}%"></div>
+                            </div>
+                            <div class="text-center mb-2">
+                                <span class="text-sm font-medium">Score: ${marketScore}/10</span>
+                            </div>
+                            <p class="text-xs text-gray-600 bg-white p-2 rounded">${recommendation}</p>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                alternativesContainer.innerHTML = '<p class="text-gray-500 col-span-3 text-center">No alternative crop data available</p>';
+            }
+        }
+
+        function getTrendIcon(trend) {
+            switch(trend.toLowerCase()) {
+                case 'increasing':
+                case 'up':
+                    return '<i class="fas fa-arrow-up"></i>';
+                case 'decreasing':
+                case 'down':
+                    return '<i class="fas fa-arrow-down"></i>';
+                case 'stable':
+                default:
+                    return '<i class="fas fa-minus"></i>';
+            }
+        }
+
+        function getTrendColor(trend) {
+            switch(trend.toLowerCase()) {
+                case 'increasing':
+                case 'up':
+                    return 'trend-up';
+                case 'decreasing':
+                case 'down':
+                    return 'trend-down';
+                case 'stable':
+                default:
+                    return 'trend-stable';
+            }
+        }
+
+        function getPriorityClass(priority) {
+            switch(priority) {
+                case 'high': return 'text-red-700';
+                case 'medium': return 'text-yellow-700';
+                case 'low': return 'text-green-700';
+                default: return 'text-gray-700';
+            }
+        }
+
+        // Initialize language
+        updateLanguage();
+    </script>
+</body>
+</html>
