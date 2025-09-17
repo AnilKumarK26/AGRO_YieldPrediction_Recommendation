@@ -1,0 +1,141 @@
+# ==== AGRO Yield Prediction Project .gitignore ====
+
+# Environment Variables & Sensitive Files
+.env
+.env.local
+.env.production
+.env.development
+*.env
+
+# Specific files to ignore
+sample.txt
+
+# Specific folders to ignore
+codes/
+
+# Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Translations
+*.mo
+*.pot
+
+# Django/Flask stuff
+*.log
+local_settings.py
+db.sqlite3
+instance/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE Files
+# PyCharm
+.idea/
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Operating System Files
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Project-specific for Machine Learning
+# Model files
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5
+*.model
+*.sav
+
+# Data files
+*.csv
+*.xlsx
+*.json
+data/
+datasets/
+models/
+trained_models/
+
+# Logs and temporary files
+logs/
+temp/
+tmp/
+*.backup
+*.bak
+
+# Cache directories
+cache/
+.cache/
+
+# Output files
+output/
+results/
