@@ -1,6 +1,6 @@
-# YieldWise AI: Crop Yield Prediction & Market Advisor
+# Krishi AI: Crop Yield Prediction & Market Advisor
 
-YieldWise AI is a full-stack platform that predicts crop yield from real-world environmental signals and provides AI-powered farming recommendations plus market trend analysis tailored for Indian agricultural conditions. It combines a machine learning model with data from SoilGrids, Open‑Elevation, and Open‑Meteo, and augments results with Groq LLM insights for agronomy and pricing strategies. A simple web UI is included.
+Krishi AI is a full-stack platform that predicts crop yield from real-world environmental signals and provides AI-powered farming recommendations plus market trend analysis tailored for Indian agricultural conditions. It combines a machine learning model with data from SoilGrids, Open‑Elevation, and Open‑Meteo, and augments results with Groq LLM insights for agronomy and pricing strategies. A simple web UI is included.
 
 ## Key Features
 - **Yield prediction**: ML model (RandomForest/GBR) predicts `quintals/hectare` using soil, weather, elevation, and farm inputs.
