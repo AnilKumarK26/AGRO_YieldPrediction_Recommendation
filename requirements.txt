@@ -1,0 +1,11 @@
+Flask
+flask-cors
+pymongo
+python-dotenv
+requests
+numpy
+pandas
+scikit-learn
+joblib
+groq
+openai
