@@ -169,5 +169,3 @@ Base URL: `http://localhost:5000`
 - Fork the repo, create a feature branch, open a PR.
 - Keep changes focused; update docs when modifying APIs or services.
 
-## License
-Add a license file (e.g., MIT) to clarify usage.
