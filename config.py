@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 # MongoDB Configuration
@@ -20,7 +19,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 # AGMARKNET Configuration (Real Market Data)
-AGMARKNET_API_KEY = os.getenv("AGMARKNET_API_KEY", "579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b")
+AGMARKNET_API_KEY = os.getenv("AGMARKNET_API_KEY", "")
 
 # Default values when APIs fail
 DEFAULT_VALUES = {
@@ -44,34 +43,6 @@ DEFAULT_VALUES = {
     'elevation': 100.0
 }
 
-# ============================================================================
-# REMOVED: CROP_PRICES dictionary
-# ============================================================================
-# Crop prices are now fetched from real market data sources via:
-# services/real_market_data_service.py
-#
-# This ensures farmers get accurate, up-to-date prices from:
-# - AGMARKNET (Government of India Agricultural Marketing API)
-# - State APMC (Agricultural Produce Market Committee) data
-# - Real-time market trends
-#
-# To get crop prices in your code, use:
-#   from services.real_market_data_service import get_real_market_price
-#   price_data = get_real_market_price(crop_type, state, district)
-#
-# Example response:
-#   {
-#       'current': 2200,
-#       'min': 1900,
-#       'max': 2600,
-#       'average': 2250,
-#       'trend': 'increasing',
-#       'source': 'AGMARKNET (Government of India)',
-#       'last_updated': '2026-01-28T10:30:00'
-#   }
-# ============================================================================
-
-# State-wise agricultural zones (for future enhancements)
 AGRICULTURAL_ZONES = {
     'odisha': {
         'major_crops': ['rice', 'groundnut', 'turmeric'],
